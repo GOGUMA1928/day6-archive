@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DAY6 ARCHIVE — Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#fbfcfc;--card:#fff;--ink:#111;--muted:#686d72;--line:#e3e6e8;--soft:#eef0f2;--on-ink:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0e0e0e;--card:#181818;--ink:#f2f2f2;--muted:#9a9a9a;--line:#303030;--soft:#242424;--on-ink:#0e0e0e}}
+:root[data-theme="dark"]{--paper:#0e0e0e;--card:#181818;--ink:#f2f2f2;--muted:#9a9a9a;--line:#303030;--soft:#242424;--on-ink:#0e0e0e}
+*{box-sizing:border-box}
+:root{--r:14px}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;line-height:1.55}
+button,input,select,textarea{font:inherit;color:inherit}
+.big{font-family:Inter,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-weight:700;text-transform:uppercase;line-height:.95;letter-spacing:-.035em}
+header{padding:20px 6% 0;display:flex;justify-content:flex-end;align-items:flex-start;position:relative;z-index:20;min-height:56px}
+.hr{position:relative;display:flex;flex-direction:column;align-items:flex-end;padding-bottom:14px}
+.menu-btn{border:0;background:transparent;font-size:12px;letter-spacing:.12em;cursor:pointer;padding:8px 4px;color:var(--ink);font-weight:600}
+#menuNav{position:absolute;top:100%;right:0;flex-direction:row;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:4px;white-space:nowrap;width:max-content;max-width:calc(100vw - 12%);padding:8px 12px 8px 20px;background:var(--card);border-radius:20px;box-shadow:0 14px 40px rgba(0,0,0,.14);opacity:0;visibility:hidden;transform:translateY(-10px);transition:opacity .25s,transform .25s,visibility .25s}
+.hr:hover #menuNav,.hr:focus-within #menuNav,.hr.open #menuNav{opacity:1;visibility:visible;transform:none}
+.hr{align-self:flex-end}
+.logo{font-family:Inter,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-size:20px;letter-spacing:1px}
+nav{display:flex;gap:22px;font-size:12px}
+nav a{color:var(--muted);text-decoration:none;padding:7px 15px;border-radius:999px}
+nav a.active{background:var(--ink);color:var(--on-ink);font-weight:bold}
+main{max-width:1280px;margin:auto;padding:170px 5% 140px}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.primary{background:var(--ink);color:var(--on-ink);border:0;padding:12px 22px;cursor:pointer;font-size:13px;border-radius:999px}
+.secondary{border:1px solid var(--ink);padding:9px 16px;background:transparent;cursor:pointer;font-size:12px;border-radius:999px}
+.chip{border:1px solid var(--line);background:transparent;padding:7px 14px;font-size:12px;cursor:pointer;border-radius:999px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
+
+.hr{display:flex;align-items:center;gap:10px}
+.round{width:38px;height:38px;border-radius:50%;border:0;background:var(--ink);color:var(--on-ink);cursor:pointer;display:grid;place-items:center;flex:none}
+.tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.tile{aspect-ratio:1/1;background:var(--soft);border-radius:16px;padding:10px;gap:6px;display:flex;flex-direction:column;justify-content:space-between;--dc:var(--ink)}
+.tile.concert{--dc:#cf4b4b}.tile.fanmeeting{--dc:#4a7fd1}.tile.festival{--dc:#dba03a}.tile.etc{--dc:#3fa57e}
+.tile .ic{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--dc) 15%,transparent);color:var(--dc)}
+.tile .tl{font-size:11px;color:var(--muted);white-space:nowrap}
+.tile .tv{font-size:18px;font-weight:700;line-height:1.15;margin-top:2px}
+.mchip{display:inline-flex;align-items:center;gap:10px;border:0;background:var(--soft);border-radius:18px;padding:8px 20px 8px 8px;font-size:13px;cursor:pointer}
+.mchip .mi{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--ink) 10%,transparent);font-size:12px;font-weight:700}
+.mchip .mi{overflow:hidden}
+.mchip .mi img{width:70%;height:70%;object-fit:contain}
+.mchip .mi.wide{width:auto;height:32px;padding:0 12px;border-radius:999px}
+.mchip[aria-pressed="true"] .mi img{filter:invert(1)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .mchip .mi img{filter:invert(1)}:root:not([data-theme="light"]) .mchip[aria-pressed="true"] .mi img{filter:none}}
+:root[data-theme="dark"] .mchip .mi img{filter:invert(1)}:root[data-theme="dark"] .mchip[aria-pressed="true"] .mi img{filter:none}
+.mchip[aria-pressed="true"]{background:var(--ink);color:var(--on-ink)}
+.mchip[aria-pressed="true"] .mi{background:color-mix(in srgb,var(--on-ink) 22%,transparent)}
+.group>*{min-width:0}
+.cards.stack{display:flex;gap:0;overflow-x:auto;padding:18px 96px 12px 0;scrollbar-width:none;--cw:190px;--ov:110px}
+.cards.stack::-webkit-scrollbar{display:none}
+.stack .card{flex:0 0 var(--cw);width:var(--cw);margin-left:calc(var(--ov)*-1);position:relative;transition:transform .3s ease;border-radius:var(--r);box-shadow:-10px 0 22px -12px rgba(0,0,0,.4)}
+.stack .card:first-child{margin-left:auto}
+.stack .card:hover,.stack .card:focus-visible{z-index:5;transform:translateY(-10px)}
+.stack .card:hover~.card,.stack .card:focus-visible~.card,.stack .card.act~.card{transform:translateX(calc(var(--ov) * .75))}
+.stack .card.act{z-index:4;transform:translateY(-10px)}
+.stk-nav .round[aria-disabled="true"]{opacity:.35;cursor:default}
+.stack .card>div:last-child{display:none}
+.ov{position:absolute;left:0;right:0;bottom:0;padding:36px 10px 10px;background:linear-gradient(transparent,rgba(0,0,0,.72));color:#fff;pointer-events:none}
+.cv.empty .ov{background:none;color:var(--ink)}
+.ov .od{font:700 26px Inter,"Apple SD Gothic Neo",sans-serif;line-height:1}
+.ov .ot{font-size:12px;line-height:1.35;margin-top:6px;opacity:0;max-height:0;overflow:hidden;transition:opacity .25s,max-height .25s}
+.stack .card:hover .ot,.stack .card:focus-visible .ot{opacity:1;max-height:3.4em}
+dialog:focus,dialog:focus-visible{outline:none}
+.a-tabs{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:32px 0 4px}
+.a-tabs .all{margin-left:auto}
+.cnt{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 4px;margin-left:8px;border:1px solid currentColor;border-radius:999px;font-size:10px;font-weight:600;line-height:1;vertical-align:1px}
+.stk-nav{display:flex;flex-direction:column;gap:8px;justify-content:center}
+.stk-nav[hidden]{display:none}
+.stk-wrap{display:flex;align-items:center;gap:14px}
+.stk-wrap .cards{flex:1;min-width:0}
+.search-pill{display:flex;align-items:center;gap:10px;width:100%;margin:16px 0 24px;padding:17px 20px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--muted);font-size:14px;cursor:pointer;text-align:left}
+/* search */
+#searchDlg{margin:5vh auto auto;width:min(780px,calc(100% - 24px));max-height:90vh}
+.s-top{display:flex;gap:10px;align-items:center}
+.s-box{flex:1;display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:999px;padding:0 18px;min-width:0}
+.s-box:focus-within{border-color:var(--ink)}
+.s-box input{flex:1;min-width:0;border:0;background:transparent;padding:14px 0;font-size:15px;outline:0}
+.s-filters{display:flex;flex-direction:column;gap:12px;margin:24px 0 10px}
+.s-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.s-row .lbl{font-size:11px;color:var(--muted);width:38px}
+#sResult{margin-top:12px}
+.s-count{font-size:12px;color:var(--muted);margin:10px 0 2px}
+.s-songs{margin:8px 0 6px;padding:14px 16px;border:1px solid var(--line);border-radius:18px}
+.sg{padding:6px 0}
+.sg b{font-size:14px}.sg span{font-size:12px;color:var(--muted);margin-left:8px}
+.sg-d{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.res{display:grid;grid-template-columns:64px 1fr;gap:18px;padding:24px 0;border-top:1px solid var(--line);cursor:pointer}
+.res .th{aspect-ratio:3/4;border-radius:10px;overflow:hidden;background:var(--soft)}
+.res .th img{width:100%;height:100%;object-fit:cover;display:block}
+.res .th.empty{display:flex;align-items:center;justify-content:center;font:500 22px Inter,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--muted);border:1px solid var(--line);background:transparent}
+.res .rd{font-size:12px;color:var(--muted)}
+.res .rt{font-size:15px;font-weight:bold;margin:2px 0}
+.res .rs{font-size:12px;color:var(--muted);line-height:1.5}
+mark{background:var(--ink);color:var(--on-ink);border-radius:4px;padding:0 3px}
+/* hero */
+.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;padding-bottom:38px;border-bottom:1px solid var(--ink)}
+.hero .yr{font-size:13px;margin-bottom:8px}
+.hero h1{margin:0;font-size:clamp(96px,15vw,210px);line-height:.8;letter-spacing:-.05em}
+.info{font-size:13px;width:min(470px,100%)}
+.info h2{font:400 17px Inter,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;margin:0 0 18px}
+.info dl{margin:0}.info dl div{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)}
+.info h2{text-align:right}.info dt{color:var(--muted)}.info dd{margin:0;font-weight:bold}
+.lg span{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.sq{display:inline-block;width:10px;height:10px;background:var(--ink);border-radius:50%}
+.sq.o{background:transparent;border:1.5px solid var(--ink)}
+.cdot{display:inline-block;width:9px;height:9px;border-radius:50%;flex:none;vertical-align:middle;margin-right:6px;background:var(--dc)}
+.cdot.concert{--dc:#cf4b4b}.cdot.fanmeeting{--dc:#4a7fd1}.cdot.festival{--dc:#dba03a}.cdot.etc{--dc:#3fa57e}
+.cdot.album{background:transparent;border:1.5px solid currentColor}
+.dn .cdot{margin:0}
+
+/* controls */
+.controls{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:34px 0 18px}
+.month-control{display:flex;align-items:center;gap:16px}
+.month-control button{border:0;background:var(--ink);color:var(--on-ink);width:38px;height:38px;cursor:pointer;border-radius:50%}
+.month-control button,#addBtn,.stk-nav .round{background:#43474b;color:#fff}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .month-control button,:root:not([data-theme="light"]) #addBtn,:root:not([data-theme="light"]) .stk-nav .round{background:#9aa0a6;color:#0e0e0e}}
+:root[data-theme="dark"] .month-control button,:root[data-theme="dark"] #addBtn,:root[data-theme="dark"] .stk-nav .round{background:#9aa0a6;color:#0e0e0e}
+#monthLabel{font:500 34px Inter,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;min-width:200px}
+.filter{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:14px 0 32px}
+.filter .lbl{font-size:12px;color:var(--muted);margin-right:4px}
+.filter .chip:not([aria-pressed="true"]){border-color:color-mix(in srgb,var(--ink) 45%,transparent);background:color-mix(in srgb,var(--ink) 7%,transparent)}
+
+/* calendar */
+.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid var(--ink)}
+.weekday{padding:18px 8px;font-size:11px;color:var(--muted);border-bottom:1px solid var(--line)}
+.day{min-height:180px;padding:14px 12px;border-bottom:1px solid var(--line);cursor:pointer;min-width:0;transition:background .2s}
+.day:hover{background:rgba(110,125,140,.16)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .day:hover{background:rgba(255,255,255,.1)}}
+:root[data-theme="dark"] .day:hover{background:rgba(255,255,255,.1)}
+.day.sel{background:var(--card);box-shadow:inset 0 0 0 2px var(--ink);border-radius:var(--r)}
+.day.other{opacity:.35}
+.dn{font:500 17px Inter,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.day.today .dn span{background:var(--ink);color:var(--on-ink);padding:1px 9px;border-radius:999px}
+.it{margin-top:14px;cursor:pointer}
+.pw{position:relative;aspect-ratio:3/4;border-radius:12px;overflow:hidden;background:var(--soft)}
+.it .th{display:block;width:100%;height:100%;object-fit:cover;background:var(--soft);filter:grayscale(1);transition:filter .25s}
+.pw.ph{display:flex;align-items:center;justify-content:center;border:1px dashed color-mix(in srgb,var(--ink) 38%,transparent);background:transparent;border-radius:12px}
+.pw.ph>.cdot,.lgs .cdot{width:14px;height:14px;margin:0}
+.lgs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;padding:8px}
+.lgs img{width:30px;height:30px;object-fit:contain}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .lgs img{filter:invert(1)}}
+:root[data-theme="dark"] .lgs img{filter:invert(1)}
+.plus{position:absolute;top:6px;right:6px;z-index:2;background:var(--ink);color:var(--on-ink);border-radius:999px;font-size:11px;font-weight:600;padding:1px 8px;line-height:17px}
+.it:hover .th,.it:focus-visible .th{filter:none}
+.cap{position:absolute;left:0;right:0;bottom:0;padding:28px 8px 8px;background:linear-gradient(transparent,rgba(0,0,0,.75));color:#fff;font-size:11px;line-height:1.35;opacity:0;transition:opacity .2s;pointer-events:none}
+.it:hover .cap,.it:focus-visible .cap{opacity:1}
+.dots{display:flex;gap:3px;flex-wrap:wrap;margin-top:4px}
+.dots b{font:700 10px Inter,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;border:1px solid currentColor;padding:0 6px;line-height:15px;border-radius:999px}
+
+/* archive */
+.arch-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:130px 0 0;padding-bottom:24px;border-bottom:1px solid var(--ink)}
+.arch-head h2{margin:0;font-size:clamp(40px,7vw,72px)}
+.vt{display:flex;gap:6px}
+.group{display:grid;grid-template-columns:150px 1fr;gap:30px;padding:52px 0;border-bottom:1px solid var(--line)}
+.gm{font:500 44px Inter,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;line-height:1;text-transform:uppercase;position:sticky;top:12px;align-self:start}
+.gm{text-align:center}
+.gm .mn{display:block;font-size:52px;line-height:.9;letter-spacing:-.04em}
+.gm .mt{display:block;font-size:13px;letter-spacing:.14em;color:var(--muted);margin-top:22px;font-weight:500}
+.gm small{display:block;font:12px Inter,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--muted);margin-bottom:6px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:44px 24px}
+.card{cursor:pointer;min-width:0}
+.cv{position:relative;aspect-ratio:3/4;background:var(--soft);overflow:hidden;border-radius:var(--r)}
+.cv img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(1);transition:filter .25s,transform .35s}
+.card:hover .cv img,.card:focus-visible .cv img{filter:none;transform:scale(1.03)}
+.cv.empty{display:flex;align-items:center;justify-content:center;font:500 64px Inter,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--muted);border:1px solid var(--line);background:transparent}
+.cv .n{position:absolute;right:6px;bottom:6px;background:var(--ink);color:var(--on-ink);font-size:11px;padding:2px 9px;border-radius:999px}
+.cd{font:500 24px Inter,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;margin-top:16px;display:flex;align-items:baseline;gap:8px}
+.cd small{font:11px Inter,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--muted)}
+.ct{font-size:14px;line-height:1.5;margin-top:9px;font-weight:bold}
+.cs{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.5}
+.cards.list{grid-template-columns:1fr;gap:0}
+.cards.list .card{display:grid;grid-template-columns:72px 1fr;gap:6px 22px;padding:26px 0;border-bottom:1px solid var(--line)}
+.cards.list .card:last-child{border-bottom:0}
+.cards.list .cv.empty{font-size:30px}
+.cards.list .cd{margin-top:0}
+.empty-msg{padding:64px 0;color:var(--muted);font-size:13px}
+.store-note{margin:0 6% 24px;padding:14px 18px;border-radius:14px;background:var(--soft);font-size:13px;line-height:1.6}
+.ft-tools{display:block;margin-top:14px;letter-spacing:0;font-family:Inter,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-size:12px}
+.linkbtn{border:0;background:none;padding:6px 0;margin-right:18px;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:12px}
+footer{padding:48px 6%;border-top:1px solid var(--line);color:var(--muted);font:11px Georgia,serif;letter-spacing:2px}
+
+/* dialogs */
+dialog{width:min(520px,calc(100% - 24px));max-height:calc(100% - 24px);overflow:auto;border:0;border-radius:26px;box-shadow:0 20px 60px #0006;background:var(--card);color:var(--ink);padding:38px}
+dialog::backdrop{background:#000a}
+dialog h2{font:500 34px Inter,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;text-transform:uppercase;margin:0 0 30px}
+.field{margin:24px 0}
+.field>label,.field>.lab{display:block;font-size:12px;color:var(--muted);margin-bottom:7px}
+.field input[type=text],.field input[type=date],.field textarea{width:100%;padding:12px 14px;border:1px solid var(--line);background:transparent;border-radius:14px}
+.field textarea{min-height:70px;resize:vertical}
+.pick{display:flex;flex-wrap:wrap;gap:8px}
+.pick label{cursor:pointer}
+.pick input{position:absolute;opacity:0;pointer-events:none}
+.pick span{display:inline-flex;border:1px solid var(--line);padding:8px 15px;font-size:13px;border-radius:999px}
+.pick input:checked+span{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
+.pick input:focus-visible+span{outline:2px solid var(--ink);outline-offset:2px}
+#catPick{margin-bottom:10px}
+.hint{font-size:11px;color:var(--muted);margin-top:6px}
+.field .song-row{display:flex;gap:8px}
+.field .song-row input[type=text]{width:auto;flex:1;min-width:0}
+#songChips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.track{margin-top:10px;padding:14px;border:1px solid var(--line);border-radius:18px}
+.track .tl{font-size:12px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.track .tc{display:flex;flex-wrap:wrap;gap:6px}
+.upl-in{position:absolute;opacity:0;pointer-events:none}
+.upl{display:inline-block}
+.upl-in:focus-visible+.upl{outline:2px solid var(--ink);outline-offset:2px}
+#imgList{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px;margin-top:10px}
+.ith{position:relative}
+.ith img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;border:1px solid var(--line);border-radius:12px}
+.ith .tg{position:absolute;left:6px;top:6px;background:var(--ink);color:var(--on-ink);font-size:10px;padding:2px 8px;border-radius:999px}
+.ith button{position:absolute;font-size:10px;padding:2px 8px;border:0;cursor:pointer;background:var(--card);color:var(--ink);border-radius:999px}
+.ith .x{right:6px;top:6px}.ith .mk{left:6px;bottom:6px}
+.dialog-actions{display:flex;justify-content:space-between;gap:8px;margin-top:36px}
+.dialog-actions .right{display:flex;gap:8px}
+.danger{background:none;border:0;color:var(--ink);text-decoration:underline;cursor:pointer;font-size:12px}
+/* detail */
+#detail .dialog-actions{justify-content:flex-end}
+.dv-total{font:700 24px Inter,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;margin:0 0 20px}
+.dv-idx{font-size:12px;color:var(--muted);margin-bottom:10px}
+.dv-rec+.dv-rec{margin-top:26px;padding-top:26px;border-top:1px solid var(--line)}
+.dv-main img{width:100%;max-height:70vh;object-fit:contain;display:block;background:var(--soft);border-radius:18px}
+.dv-th{display:flex;gap:8px;margin-top:8px}
+.dv-th img{width:56px;aspect-ratio:3/4;object-fit:cover;cursor:pointer;border:2px solid transparent;opacity:.6;border-radius:8px}
+.dv-th img[aria-current="true"]{border-color:var(--ink);opacity:1}
+.dv-info{margin-top:16px;font-size:14px;line-height:1.6}
+.dv-info .d{font:500 30px Inter,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+.dv-info dl{margin:12px 0 0;display:grid;grid-template-columns:64px 1fr;gap:6px 12px;font-size:13px}
+.dv-info dt{color:var(--muted)}.dv-info dd{margin:0;white-space:pre-wrap}
+@media(max-width:760px){
+ header{flex-direction:column;align-items:flex-start;gap:14px}
+ nav{gap:14px;flex-wrap:wrap}
+ .hero{flex-direction:column;align-items:flex-start}
+ .info{width:100%}
+ .tiles{grid-template-columns:repeat(5,84px);overflow-x:auto}
+ .cards.stack{--cw:150px;--ov:88px}
+ #monthLabel{font-size:26px;min-width:150px}
+ .day{min-height:104px;padding:8px 4px}
+ .cap{display:none}
+ .weekday{font-size:9px;padding:8px 3px}
+ .group{grid-template-columns:1fr;gap:14px}
+ .gm{position:static;font-size:34px}
+ .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hr" id="menuWrap">
+  <button type="button" class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menuNav">MENU <span aria-hidden="true">▾</span></button>
+  <nav id="menuNav">
+    <a href="index.html">HOME</a>
+    <a href="discography.html">DISCOGRAPHY</a>
+    <a href="tracks.html">TRACKS</a>
+    <a class="active" href="04_calendar.html">CALENDAR</a>
+  </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div>
+      <h1 class="big" id="heroMonth" aria-label="현재 월"></h1>
+    </div>
+    <div class="info">
+      <div><h2>기록 현황</h2><div class="tiles" id="stats"></div></div>
+    </div>
+  </section>
+
+  <div class="controls">
+    <div class="month-control">
+      <button id="prev" aria-label="이전 달">←</button>
+      <div id="monthLabel" aria-live="polite"></div>
+      <button id="next" aria-label="다음 달">→</button>
+    </div>
+    <button class="primary" id="addBtn">＋ 기록 추가</button>
+  </div>
+  <button type="button" class="search-pill" id="searchBtn" aria-label="검색 열기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span>공연명 · 앨범 · 곡 · 멤버 · 메모 검색</span></button>
+  <div class="filter" id="filter" role="group" aria-label="멤버별 보기"></div>
+
+  <div class="calendar" id="calendar">
+    <div class="weekday">SUN</div><div class="weekday">MON</div><div class="weekday">TUE</div>
+    <div class="weekday">WED</div><div class="weekday">THU</div><div class="weekday">FRI</div><div class="weekday">SAT</div>
+  </div>
+
+  <div class="arch-head">
+    <h2 class="big">Archive</h2>
+    <div class="vt" role="group" aria-label="보기 방식">
+      <button class="chip" id="vGallery" aria-pressed="true">갤러리</button>
+      <button class="chip" id="vList" aria-pressed="false">리스트</button>
+    </div>
+  </div>
+  <div id="archive"></div>
+</main>
+
+<div id="storeNote" class="store-note" role="status" hidden>이 화면에서는 브라우저 저장이 막혀 있어, 지금 입력한 기록은 창을 닫으면 사라져요. 하단의 "기록 내보내기"로 파일을 보관하거나, 크롬·사파리 같은 브라우저에서 파일을 직접 열어 주세요.</div>
+<footer>DAY6 ARCHIVE · EVERY MOMENT MATTERS
+  <span class="ft-tools"><button type="button" class="linkbtn" id="expBtn">기록 내보내기</button><button type="button" class="linkbtn" id="impBtn">기록 가져오기</button><input type="file" id="impFile" accept="application/json,.json" hidden></span>
+</footer>
+
+<dialog id="searchDlg" aria-label="검색">
+  <div class="s-top">
+    <div class="s-box">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="sInput" type="search" autocomplete="off" aria-label="검색어" placeholder="공연명 · 앨범 · 곡 · 멤버 · 메모 (초성 가능)">
+    </div>
+    <button type="button" class="round" id="sClose" aria-label="검색 닫기">✕</button>
+  </div>
+  <div class="s-filters" id="sFilters"></div>
+  <div id="sResult" aria-live="polite"></div>
+</dialog>
+
+<dialog id="confirmDlg" tabindex="-1" aria-label="확인" style="width:min(380px,calc(100% - 24px))">
+  <p id="cfMsg" style="margin:0 0 22px;font-size:15px;line-height:1.6;white-space:pre-line"></p>
+  <div class="dialog-actions" style="justify-content:flex-end;margin-top:0">
+    <button type="button" class="secondary" id="cfNo">취소</button>
+    <button type="button" class="primary" id="cfOk">확인</button>
+  </div>
+</dialog>
+
+<dialog id="detail" aria-label="기록 상세" tabindex="-1">
+  <div id="detailBody"></div>
+  <div class="dialog-actions">
+    <button type="button" class="primary" id="detailClose">닫기</button>
+  </div>
+</dialog>
+
+<dialog id="dlg">
+  <form id="form">
+    <h2 id="dlgTitle">새 기록</h2>
+    <input type="hidden" id="fId">
+    <div class="field">
+      <label for="fDate">날짜</label>
+      <input id="fDate" type="date" required>
+    </div>
+    <div class="field">
+      <span class="lab">포스터 · 티켓 이미지</span>
+      <input class="upl-in" id="fImg" type="file" accept="image/*" multiple>
+      <label class="secondary upl" for="fImg" id="imgAdd">＋ 이미지 추가</label>
+      <div id="imgList"></div>
+      <div class="hint">최대 4장. 첫 번째 이미지가 대표 이미지로 쓰이며, 저장 전에 자동으로 용량이 줄어듭니다.</div>
+    </div>
+    <div class="field">
+      <label for="fConcert">공연명</label>
+      <div class="pick" id="catPick" role="radiogroup" aria-label="공연 분류">
+        <label><input type="radio" name="cat" value="concert" checked><span>콘서트</span></label>
+        <label><input type="radio" name="cat" value="fanmeeting"><span>팬미팅</span></label>
+        <label><input type="radio" name="cat" value="festival"><span>페스티벌</span></label>
+        <label><input type="radio" name="cat" value="etc"><span>기타</span></label>
+      </div>
+      <input id="fConcert" type="text" list="concertList" maxlength="100" placeholder="분류를 고른 뒤 공연 이름을 선택하거나 직접 입력">
+      <datalist id="concertList"></datalist>
+    </div>
+    <div class="field">
+      <label for="fAlbum">앨범명</label>
+      <input id="fAlbum" type="text" list="albumList" maxlength="100" placeholder="앨범 이름을 입력하거나 선택">
+      <datalist id="albumList"></datalist>
+      <div class="hint">공연명과 앨범명 중 하나만 입력해도 저장됩니다.</div>
+    </div>
+    <div class="field">
+      <label for="fSong">곡명</label>
+      <div class="song-row">
+        <input id="fSong" type="text" list="songList" maxlength="100" placeholder="곡 이름을 입력하고 추가">
+        <button type="button" class="secondary" id="addSongBtn">추가</button>
+      </div>
+      <datalist id="songList"></datalist>
+      <div class="track" id="trackPanel" hidden></div>
+      <div id="songChips"></div>
+      <div class="hint">앨범을 선택하면 수록곡이 나타나요. 아래에 담긴 곡을 누르면 삭제됩니다.</div>
+    </div>
+    <div class="field">
+      <span class="lab" id="mLab">멤버</span>
+      <div class="pick" id="memberPick" role="group" aria-labelledby="mLab"></div>
+      <div style="margin-top:8px"><button type="button" class="secondary" id="allBtn">전체 선택</button></div>
+    </div>
+    <div class="field">
+      <label for="fMemo">메모</label>
+      <textarea id="fMemo" placeholder="기록하고 싶은 내용"></textarea>
+    </div>
+    <div class="dialog-actions">
+      <button type="button" class="danger" id="delBtn" hidden>삭제</button>
+      <div class="right">
+        <button type="button" class="secondary" id="cancelBtn">취소</button>
+        <button type="submit" class="primary">기록 저장</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<script>
+const KEY="day6_archive_records_v1";
+const MEMBERS=[
+ {id:"sungjin",name:"성진",s:"성"},
+ {id:"youngk",name:"Young K",s:"K"},
+ {id:"wonpil",name:"원필",s:"원"},
+ {id:"dowoon",name:"도운",s:"도"}
+];
+const ALBUMS={
+"The Day":[`Freely`,`Out of My Mind`,`Congratulations`,`Habits`,`Like That Sun`,`Colors`],
+"Daydream":[`First Time`,`Blood`,`Letting Go`,`Sing Me`,`Wish`,`Hunt`],
+"Every DAY6 January":[`I Wait`,`Goodbye Winter`],
+"Every DAY6 February":[`You Were Beautiful`,`My Day`],
+"Every DAY6 March":[`How Can I Say`,`I Would`],
+"Every DAY6 April":[`I'm Serious`,`Say Wow`],
+"Every DAY6 May":[`Dance Dance`,`Man in a Movie`],
+"Every DAY6 July":[`Hi Hello`,`Be Lazy`],
+"Every DAY6 August":[`What Can I Do`,`Whatever!`],
+"Every DAY6 September":[`I'll Remember`,`I Loved You`],
+"Every DAY6 October":[`I Need Somebody`,`When You Love Someone`],
+"Every DAY6 November":[`Pouring`,`All Alone`],
+"Sunrise":[`Lean On Me`,`I Smile`,`Man in a Movie`,`I Wait`,`How Can I Say`,`Letting Go (Rebooted Ver.)`,`I Would`,`Goodbye Winter`,`I'm Serious`,`Say Wow`,`Dance Dance`,`My Day`,`You Were Beautiful`,`Congratulations (Final Ver.)`],
+"Moonrise":[`Better Better`,`I Like You`,`What Can I Do`,`I'll Remember`,`Whatever!`,`Be Lazy`,`Hi Hello`,`I Loved You`,`When You Love Someone`,`All Alone`,`Pouring`,`I Need Somebody`,`I'll Try`,`Colors (Final Ver.)`,`Congratulations`,`Freely (Final Ver.)`,`Habits (Final Ver.)`,`Like That Sun (Final Ver.)`,`Out of My Mind (Final Ver.)`],
+"Shoot Me: Youth Part 1":[`Warning!`,`Shoot Me`,`Somehow`,`Still`,`Talking To`,`Feeling Good`],
+"Remember Us: Youth Part 2":[`121U`,`Beautiful Feeling`,`days gone by`,`Headache`,`Hurt Road`,`Marathon`,`So Cool`],
+"The Book of Us: Gravity":[`For me`,`Time of Our Life`,`How to love`,`Wanna Go Back`,`Cover`,`Best Part`],
+"The Book of Us: Entropy":[`365247`,`About Now`,`Deep in love`,`Emergency`,`Like a Flowing Wind`,`Not Fine`,`Not Mine`,`Ouch`,`Rescue Me`,`Stop Talking`,`Sweet Chaos`],
+"The Book of Us: Gluon":[`Landing -Intro-`,`Landed`,`Ocean -Interlude 1-`,`Thanks To`,`Forest -Interlude 2-`,`Where The Sea Sleeps`,`To be continued -Outro-`],
+"The Book of Us: The Demon":[`Zombie`,`Tick Tock`,`Afraid`,`Day and Night`,`Love me or Leave me`,`Stop`,`1 to 10`],
+"The Book of Us: Negentropy":[`One`,`Healer`,`Above the Clouds`,`everyday we fight`,`So Let's Love`,`You make Me`,`Only`],
+"Fourever":[`Welcome to the Show`,`Get The Hell Out`,`Happy`,`Let Me Love You`,`Didn't Know`,`Sad Ending`,`The Power of Love`],
+"Band Aid":[`Counter`,`Help Me Rock&Roll`,`I'm Fine`,`Melt Down`,`Monster`,`She Smiled`,`Shxtty Game`,`Still There`],
+"Right Through Me (Even of Day)":[`Right Through Me`,`All the Things You Wanted`,`From the Ending of a Tragedy`,`Home Alone`,`Love Parade`,`Walk`,`We`],
+"Unlock":[`Baby, It's Okay`,`Breaking Down`,`Everybody Rock!`,`Falling`,`I Just`,`If ~Mata Aetara~`,`Live Your Life`,`Nobody Knows`,`Say Hello`,`Stop The Rain`],
+"Eternal (Young K)":[`best song`,`come as you are`,`goodnight, dear`,`Guard You`,`Microphone (Feat. Dvwn)`,`not gonna love`,`want to love you`],
+"Letters with Notes (Young K)":[`babo`,`Bungee Jumping`,`Dreamer`,`let it be summer`,`natural`,`nothing but`,`playground`,`Soul (Feat. CHOILB)`,`Strange`,`waited`,`what is..`],
+"Pilmography (Wonpil)":[`A Journey`,`Last Goodbye`,`Pieces`,`Sincerity`,`Someday, Spring Will Come`,`Stranded`,`Unpainted Canvas`,`Voiceless`,`Walk With Me`],
+"30 (Sungjin)":[`as always`,`Check Pattern`,`Covered in Love`,`EASY`,`I don't wanna do anything`,`I don't wanna lose`,`Memories`,`Nowhere You Are`,`Wednesday Night`,`You Wake Me Up`]
+};
+const CATS={concert:"콘서트",fanmeeting:"팬미팅",festival:"페스티벌",etc:"기타"};
+const PRESETS={
+concert:[`DAY6 Live Concert "D-Day"`,`DAY6 Live Concert "Dream"`,`DAY6 Live Concert "Dream" in Bangkok`,`Every DAY6 Concert`,`Every DAY6 Finale Concert "The Best Moments"`,`DAY6 First Live in Japan "The Best Day"`,`DAY6 1st World Tour "Youth"`,`DAY6 2nd Live Tour in Japan`,`DAY6 2nd World Tour "Gravity"`,`DAY6 Christmas Special Concert "The Present"`,`DAY6 Christmas Special Concert "The Present : You Are My Day"`,`DAY6 Concert <Welcome to the Show>`,`2024 DAY6 Special Concert "The Present"`,`DAY6 3rd World Tour <Forever Young>`,`2025 DAY6 Special Concert "The Present"`,`DAY6 10th Anniversary Tour <The DECADE>`,`DAY6 10th Anniversary Tour <The DECADE> FINALE in SEOUL`],
+fanmeeting:[`DAY6 1st Fan Meeting in Singapore`,`DAY6 Fan Meeting in Singapore "Daydream"`,`DAY6 1st Fan Meeting "You Made My Day"`,`DAY6 2nd Fan Meeting "You Made My Day Ep.2 [Scentographer]"`,`DAY6 3rd Fan Meeting "I Need My Day"`,`DAY6 4th Fan Meeting "Pier 10: All My Days"`],
+festival:[`Dream Concert World in Japan 2024`],
+etc:[`DAY6 Live & Meet`,`DAY6 Showcase`]
+};
+const LOGO={"sungjin": "data:image/png;base64,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", "dowoon": "data:image/png;base64,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", "wonpil": "data:image/png;base64,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", "youngk": "data:image/png;base64,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"};
+MEMBERS.forEach(m=>m.img=LOGO[m.id]);
+const D6_SVG='<svg viewBox="0 0 144 148" height="19" fill="currentColor" aria-hidden="true"><path d="M142.323 58.204a74.457 74.457 0 0 0-6.708-18.317 72.781 72.781 0 0 0-15.493-20.15A71.271 71.271 0 0 0 95.117 4.866a78.402 78.402 0 0 0-8.1-2.263c-1.98 4.57-3.949 9.113-5.944 13.721.81.146 1.549.263 2.28.414a56.797 56.797 0 0 1 25.61 12.48 58.287 58.287 0 0 1 15.969 21.585 59.44 59.44 0 0 1 4.779 19.83 56.72 56.72 0 0 1-.207 10.068 60.663 60.663 0 0 1-2.16 11.007 59.525 59.525 0 0 1-11.31 21.059 57.578 57.578 0 0 1-19.65 15.25 56.303 56.303 0 0 1-23.69 5.471 57.04 57.04 0 0 1-23.238-4.699 57.661 57.661 0 0 1-20.502-15.026 58.358 58.358 0 0 1-8.689-13.153 59.461 59.461 0 0 1-5.777-21.772 60.624 60.624 0 0 1 .317-11.987 57.564 57.564 0 0 1 2.53-11.117c3.497-10.395 9.346-19.233 17.713-26.393a57.143 57.143 0 0 1 28.336-13.05c.72-.117 1.486-.13 2.196-.363l6.48-14.92c-5.085.078-10.027.532-14.904 1.614a71.635 71.635 0 0 0-40.22 24.635A73.503 73.503 0 0 0 6.431 44.318 74.045 74.045 0 0 0 .166 70.693a74.828 74.828 0 0 0 .927 16.055 73.343 73.343 0 0 0 5.326 17.919A72.758 72.758 0 0 0 25.822 130.8a71.806 71.806 0 0 0 19.484 11.92 70.773 70.773 0 0 0 62.93-4.673 71.74 71.74 0 0 0 20.642-18.383 74.546 74.546 0 0 0 14.833-37.288 72.1 72.1 0 0 0 .311-11.502 77.028 77.028 0 0 0-1.699-12.67z"/><path d="M56.753 36.308c.537-1.243 1.072-2.49 1.646-3.823-.178.048-.254.064-.326.088a42.843 42.843 0 0 0-18.75 12.866c-6.584 7.763-10.081 16.765-10.648 26.898a43.42 43.42 0 0 0 1.733 14.813c2.67 9.007 7.607 16.54 14.992 22.401a42.244 42.244 0 0 0 24.12 9.265 41.4 41.4 0 0 0 16.695-2.349 43.063 43.063 0 0 0 21.282-16.287c4.42-6.353 6.96-13.413 7.753-21.108a44.69 44.69 0 0 0-10.206-33.33c-5.17-6.123-11.52-10.548-19.117-13.174a40.707 40.707 0 0 0-10.945-2.2 68278.016 68278.016 0 0 0-16.417 37.988c-1.798 4.184-1.784 8.4.091 12.594 2.815 6.269 9.63 9.746 16.386 8.362 6.276-1.31 10.822-6.563 11.645-12.553.552-4.023-.254-7.774-2.683-11.071-3.243-4.401-7.594-6.566-13.134-6.174a1.14 1.14 0 0 1-.688-.034l6.225-14.35c.533.104 1.001.187 1.467.285a28.616 28.616 0 0 1 16.107 9.564c4.352 5.115 6.721 11.064 7.134 17.79a29.499 29.499 0 0 1-1.426 11.136c-1.862 5.615-5.04 10.343-9.701 14.037a28.544 28.544 0 0 1-15.827 6.211 27.744 27.744 0 0 1-10.122-1.058 28.454 28.454 0 0 1-13.784-8.91c-4.625-5.37-7.018-11.625-7.294-18.678-.182-4.647.754-9.096 2.6-13.36 3.725-8.611 7.455-17.224 11.192-25.84v.001z"/></svg>';
+const mById=Object.fromEntries(MEMBERS.map(m=>[m.id,m]));
+
+let records=[];
+let storageOK=true;
+try{records=JSON.parse(localStorage.getItem(KEY)||"[]");if(!Array.isArray(records))records=[]}catch(e){records=[];storageOK=false}
+records.forEach(r=>{r.members=r.members||[];r.songs=r.songs||[];r.images=r.images||[]});
+let current=new Date(),filterSet=new Set(),view="gallery",songs=[],imgs=[],selectedDate="",snap="";
+
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,"0");
+const dkey=(y,m,d)=>`${y}-${pad(m+1)}-${pad(d)}`;
+const title=r=>r.concert||r.album||"(제목 없음)";
+const wd=s=>new Date(s+"T00:00:00").toLocaleDateString("en-US",{weekday:"short"}).toUpperCase();
+const hasMem=(r,id)=>id==="day6"?MEMBERS.every(m=>r.members.includes(m.id)):r.members.includes(id);
+const visible=()=>filterSet.size?records.filter(r=>[...filterSet].some(id=>hasMem(r,id))):records;
+let saveErr="";
+function save(){
+ try{localStorage.setItem(KEY,JSON.stringify(records));storageOK=true;saveErr="";showStoreNote();return true}
+ catch(e){
+  const quota=e&&(e.name==="QuotaExceededError"||e.code===22||e.code===1014);
+  if(quota){saveErr="quota";return false}
+  storageOK=false;saveErr="";showStoreNote();return true
+ }
+}
+function showStoreNote(){const n=$("storeNote");if(n)n.hidden=storageOK}
+function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+function makeDots(ids){
+ const w=el("div","dots");
+ ids.forEach(id=>{const m=mById[id];if(!m)return;const b=el("b",null,m.s);b.title=m.name;w.appendChild(b)});
+ return w;
+}
+
+function dotEl(r){const k=catOf(r),d=el("i","cdot "+k);d.title=k==="album"?"앨범":CATS[k];return d}
+const ICONS={
+ all:'<path d="M5 6h14M5 12h14M5 18h9"/>',
+ concert:'<path d="M9 18V6l10-2v12"/><circle cx="7" cy="18" r="2.2"/><circle cx="17" cy="16" r="2.2"/>',
+ fanmeeting:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+ festival:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+ etc:'<circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/>'
+};
+function renderStats(){
+ const nc=k=>records.filter(r=>r.concert&&(r.cat||"concert")===k).length;
+ const rows=[["전체 기록",records.length,"all"],["콘서트",nc("concert"),"concert"],["팬미팅",nc("fanmeeting"),"fanmeeting"],["페스티벌",nc("festival"),"festival"],["기타",nc("etc"),"etc"]];
+ $("stats").innerHTML=rows.map(([k,v,c])=>`<div class="tile ${c}"><span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[c]}</svg></span><div><div class="tl">${k}</div><div class="tv">${v}</div></div></div>`).join("");
+}
+
+function renderFilter(){
+ const f=$("filter");f.innerHTML="";
+ f.appendChild(el("span","lbl","멤버별 보기"));
+ [{id:"day6",name:"",d6:true},...MEMBERS].forEach(m=>{
+  const b=el("button","mchip"+(m.d6?" d6":""));b.type="button";if(m.d6){b.innerHTML=`<span class="mi">${D6_SVG}</span>DAY6`;b.title="DAY6 (멤버 전원)"}else b.innerHTML=`<span class="mi">${m.img?`<img src="${m.img}" alt="">`:m.s}</span>${m.name}`;
+  b.setAttribute("aria-pressed",filterSet.has(m.id));
+  b.onclick=()=>{filterSet.has(m.id)?filterSet.delete(m.id):filterSet.add(m.id);render()};
+  f.appendChild(b);
+ });
+ if(filterSet.size){const c=el("button","secondary","필터 해제");c.type="button";c.onclick=()=>{filterSet.clear();render()};f.appendChild(c)}
+}
+
+function logoStack(ids,r){
+ const w=el("div","lgs");
+ if(ids.length&&MEMBERS.every(m=>ids.includes(m.id))){w.innerHTML=D6_SVG.replace('height="19"','height="34"');return w}
+ ids.forEach(id=>{const m=mById[id];if(m&&m.img){const i=new Image();i.src=m.img;i.alt=m.name;i.title=m.name;w.appendChild(i)}});
+ if(!w.children.length)w.appendChild(dotEl(r));
+ return w;
+}
+function renderCal(vis){
+ const y=current.getFullYear(),mo=current.getMonth();
+ $("monthLabel").textContent=current.toLocaleDateString("en-US",{month:"long"});
+ $("heroMonth").textContent=pad(mo+1);
+ const cal=$("calendar");cal.querySelectorAll(".day").forEach(e=>e.remove());
+ const first=new Date(y,mo,1).getDay(),days=new Date(y,mo+1,0).getDate(),prev=new Date(y,mo,0).getDate();
+ const total=Math.ceil((first+days)/7)*7,t=new Date();
+ for(let i=0;i<total;i++){
+  let d,other=false,yy=y,mm=mo;
+  if(i<first){d=prev-first+i+1;other=true;const x=new Date(y,mo-1,d);yy=x.getFullYear();mm=x.getMonth()}
+  else if(i>=first+days){d=i-first-days+1;other=true;const x=new Date(y,mo+1,d);yy=x.getFullYear();mm=x.getMonth()}
+  else d=i-first+1;
+  const key=dkey(yy,mm,d),cell=el("div","day"+(other?" other":"")+(key===selectedDate?" sel":""));
+  if(yy===t.getFullYear()&&mm===t.getMonth()&&d===t.getDate())cell.classList.add("today");
+  const items=vis.filter(r=>r.date===key);
+  const dn=el("div","dn");dn.appendChild(el("span",null,pad(d)));
+  items.slice(0,4).forEach(r=>dn.appendChild(dotEl(r)));
+  cell.appendChild(dn);
+  if(items.length){
+   const r=items[0];
+   const it=el("div","it"+(r.images.length?"":" noimg"));it.tabIndex=0;
+   it.setAttribute("aria-label",title(r)+(items.length>1?" 외 "+(items.length-1)+"건":""));
+   const box=el("div","pw"+(r.images.length?"":" ph"));
+   if(r.images.length){const im=new Image();im.className="th";im.src=r.images[0];im.alt="";box.appendChild(im)}else box.appendChild(logoStack(r.members,r));
+   const cap=el("div","cap");cap.append(dotEl(r),title(r));box.appendChild(cap);
+   if(items.length>1)box.appendChild(el("span","plus","+"+(items.length-1)));
+   it.appendChild(box);
+   const mem=[...new Set(items.flatMap(x=>x.members))];
+   if(mem.length)it.appendChild(makeDots(mem));
+   it.onkeydown=ev=>{if(ev.key==="Enter"){ev.stopPropagation();openDetail(items)}};
+   cell.appendChild(it);
+  }
+  cell.onclick=()=>{items.length?openDetail(items):openNew(key)};
+  cal.appendChild(cell);
+ }
+}
+
+function makeCard(r,stack){
+ const c=el("article","card");c.tabIndex=0;
+ const cv=el("div","cv");
+ if(r.images.length){
+  const im=new Image();im.src=r.images[0];im.alt=title(r);im.loading="lazy";cv.appendChild(im);
+  if(r.images.length>1)cv.appendChild(el("span","n","+"+(r.images.length-1)));
+ }else{cv.classList.add("empty");if(!stack)cv.textContent=r.date.slice(8)}
+ if(stack){const ov=el("div","ov");ov.appendChild(el("div","od",r.date.slice(8)));const ot=el("div","ot");ot.append(dotEl(r),title(r));ov.appendChild(ot);cv.appendChild(ov)}
+ const meta=el("div");
+ const cd=el("div","cd",r.date.slice(8));cd.appendChild(el("small",null,wd(r.date)));
+ meta.appendChild(cd);
+ const ct=el("div","ct");ct.append(dotEl(r),title(r));meta.appendChild(ct);
+ const sub=[];
+ if(r.concert&&r.cat)sub.push(CATS[r.cat]);
+ if(r.concert&&r.album)sub.push(r.album);
+ if(r.songs.length)sub.push("곡 "+r.songs.length);
+ if(sub.length)meta.appendChild(el("div","cs",sub.join(" · ")));
+ if(r.members.length)meta.appendChild(makeDots(r.members));
+ c.append(cv,meta);
+ c.onclick=()=>openDetail(r.id);
+ c.onkeydown=ev=>{if(ev.key==="Enter")openDetail(r.id)};
+ return c;
+}
+
+let archSel=null;
+function renderArchive(vis){
+ const A=$("archive");A.innerHTML="";
+ if(!vis.length){A.appendChild(el("div","empty-msg",records.length?"선택한 멤버의 기록이 없습니다.":"아직 기록이 없습니다. 달력에서 날짜를 눌러 첫 기록을 남겨 보세요."));return}
+ const sorted=[...vis].sort((a,b)=>b.date.localeCompare(a.date));
+ const groups=new Map();
+ sorted.forEach(r=>{const k=r.date.slice(0,7);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(r)});
+ const keys=[...groups.keys()];
+ const calKey=current.getFullYear()+"-"+pad(current.getMonth()+1);
+ const sel=archSel==="all"?"all":(archSel&&groups.has(archSel)?archSel:calKey);
+ const tabs=el("div","a-tabs");
+ keys.forEach(k=>{const b=el("button","chip",k.replace("-","."));b.type="button";b.setAttribute("aria-pressed",sel===k);b.appendChild(el("span","cnt",String(groups.get(k).length)));b.onclick=()=>{archSel=k;render()};tabs.appendChild(b)});
+ const allB=el("button","chip all","전체 보기");allB.type="button";allB.setAttribute("aria-pressed",sel==="all");allB.onclick=()=>{archSel="all";render()};tabs.appendChild(allB);
+ A.appendChild(tabs);
+ if(sel!=="all"&&!groups.has(sel))A.appendChild(el("div","empty-msg",sel.replace("-",".")+" 에는 기록이 없습니다."));
+ (sel==="all"?[...groups]:groups.has(sel)?[[sel,groups.get(sel)]]:[]).forEach(([k,arr])=>{
+  const g=el("section","group");
+  const gm=el("div","gm");gm.appendChild(el("small",null,k.slice(0,4)));
+  gm.appendChild(el("span","mn",k.slice(5)));
+  gm.appendChild(el("span","mt",new Date(k+"-01T00:00:00").toLocaleDateString("en-US",{month:"short"})));
+  const useStack=view!=="list"&&arr.length>=2;
+  const cards=el("div","cards"+(view==="list"?" list":useStack?" stack":""));
+  arr.forEach(r=>cards.appendChild(makeCard(r,useStack)));
+  const right=el("div");
+  if(!useStack)right.appendChild(cards);
+  if(useStack){
+   const wrap=el("div","stk-wrap");wrap.appendChild(cards);right.appendChild(wrap);
+  }
+  g.append(gm,right);A.appendChild(g);
+ });
+}
+
+function renderSuggest(){
+ const uniq=a=>[...new Set(a.filter(Boolean))];
+ const opt=v=>`<option value="${v.replace(/"/g,"&quot;")}">`;
+ $("concertList").innerHTML="";updateConcertList();
+ $("albumList").innerHTML=uniq([...Object.keys(ALBUMS),...records.map(r=>r.album)]).map(opt).join("");
+ $("songList").innerHTML=uniq(records.flatMap(r=>r.songs)).map(opt).join("");
+}
+
+function render(){
+ const vis=visible();
+ renderStats();renderFilter();renderCal(vis);renderArchive(vis);renderSuggest();
+ if($("searchDlg").open)runSearch();
+ $("vGallery").setAttribute("aria-pressed",view==="gallery");
+ $("vList").setAttribute("aria-pressed",view==="list");
+}
+
+/* detail */
+function openDetail(arg){
+ const list=(Array.isArray(arg)?arg:[records.find(x=>x.id===arg)]).filter(Boolean);
+ if(!list.length)return;
+ selectedDate=list[0].date;render();
+ const body=$("detailBody");body.innerHTML="";
+ if(Array.isArray(arg))body.appendChild(el("div","dv-total","기록 "+list.length+"개"));
+ list.forEach((r,ix)=>{
+ const b=el("section","dv-rec");body.appendChild(b);
+ if(Array.isArray(arg)&&list.length>1)b.appendChild(el("div","dv-idx",(ix+1)+" / "+list.length));
+ if(r.images.length){
+  const main=el("div","dv-main"),big=new Image();big.alt=title(r);main.appendChild(big);b.appendChild(main);
+  const th=el("div","dv-th");
+  const show=i=>{big.src=r.images[i];[...th.children].forEach((c,j)=>c.setAttribute("aria-current",j===i))};
+  r.images.forEach((s,i)=>{const t=new Image();t.src=s;t.alt=(i+1)+"번째 이미지";t.onclick=()=>show(i);th.appendChild(t)});
+  if(r.images.length>1)b.appendChild(th);
+  show(0);
+ }
+ const info=el("div","dv-info");
+ info.appendChild(el("div","d",r.date.replace(/-/g,".")+" "+wd(r.date)));
+ const dl=el("dl");
+ const row=(k,v)=>{if(!v)return;dl.appendChild(el("dt",null,k));dl.appendChild(el("dd",null,v))};
+ row("공연",r.concert);row("분류",r.concert&&r.cat?CATS[r.cat]:"");row("앨범",r.album);row("곡",r.songs.join(", "));
+ row("멤버",r.members.map(i=>mById[i]&&mById[i].name).filter(Boolean).join(", "));
+ row("메모",r.memo);
+ info.appendChild(dl);b.appendChild(info);
+ const eb=el("button","secondary","수정");eb.type="button";eb.style.marginTop="14px";
+ eb.onclick=()=>{$("detail").close();openEdit(r.id)};info.appendChild(eb);
+ });
+ $("detail").showModal();
+ $("detail").focus({preventScroll:true});
+}
+
+/* search */
+const CHO="ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
+const cho=s=>s.split("").map(c=>{const n=c.charCodeAt(0)-44032;return n>=0&&n<=11171?CHO[Math.floor(n/588)]:c}).join("");
+const isCho=q=>/^[ㄱ-ㅎ\s]+$/.test(q);
+const sCats=new Set(),sMems=new Set(),sYears=new Set();
+const catOf=r=>r.concert?(r.cat||"concert"):"album";
+function pos(text,q){
+ if(!text||!q)return -1;
+ let i=text.toLowerCase().indexOf(q.toLowerCase());
+ if(i<0&&isCho(q))i=cho(text).indexOf(q);
+ return i;
+}
+const hit=(text,q)=>pos(text,q)>=0;
+function hl(text,q){
+ const f=document.createDocumentFragment();
+ const i=pos(text,q);
+ if(i<0){f.append(text||"");return f}
+ f.append(text.slice(0,i));
+ const m=document.createElement("mark");m.textContent=text.slice(i,i+q.length);
+ f.append(m,text.slice(i+q.length));
+ return f;
+}
+function matchRec(r,q){
+ const f=[r.concert,r.album,r.memo,r.date,r.date.replace(/-/g,"."),r.concert&&CATS[r.cat||"concert"],...r.songs,...r.members.map(i=>mById[i]&&mById[i].name)];
+ return f.some(t=>hit(t||"",q));
+}
+function renderSFilters(){
+ const w=$("sFilters");w.innerHTML="";
+ const row=(label,items,set)=>{
+  const r=el("div","s-row");r.appendChild(el("span","lbl",label));
+  items.forEach(([v,t])=>{const b=el("button","chip",t);b.type="button";b.setAttribute("aria-pressed",set.has(v));b.onclick=()=>{set.has(v)?set.delete(v):set.add(v);runSearch()};r.appendChild(b)});
+  w.appendChild(r);
+ };
+ row("분류",[...Object.entries(CATS),["album","앨범"]],sCats);
+ row("멤버",MEMBERS.map(m=>[m.id,m.name]),sMems);
+ const years=[...new Set(records.map(r=>r.date.slice(0,4)))].sort().reverse();
+ if(years.length)row("연도",years.map(y=>[y,y]),sYears);
+ if(sCats.size||sMems.size||sYears.size){
+  const c=el("button","secondary","필터 초기화");c.type="button";
+  c.onclick=()=>{sCats.clear();sMems.clear();sYears.clear();runSearch()};w.appendChild(c);
+ }
+}
+function makeResult(r,q){
+ const c=el("article","res");c.tabIndex=0;
+ const th=el("div","th");
+ if(r.images.length){const im=new Image();im.src=r.images[0];im.alt="";th.appendChild(im)}else{th.classList.add("empty");th.textContent=r.date.slice(8)}
+ const b=el("div");
+ b.appendChild(el("div","rd",r.date.replace(/-/g,".")+" "+wd(r.date)));
+ const t=el("div","rt");t.append(dotEl(r),hl(title(r),q));b.appendChild(t);
+ const sub=el("div","rs");
+ if(r.concert){sub.append(CATS[r.cat||"concert"]);if(r.album){sub.append(" · ");sub.appendChild(hl(r.album,q))}}
+ if(sub.childNodes.length)b.appendChild(sub);
+ if(q){
+  const ms=r.songs.filter(s=>hit(s,q));
+  if(ms.length){const sl=el("div","rs");sl.append("곡 · ");ms.slice(0,3).forEach((s,i)=>{if(i)sl.append(", ");sl.appendChild(hl(s,q))});if(ms.length>3)sl.append(" 외 "+(ms.length-3));b.appendChild(sl)}
+  if(hit(r.memo,q)){const i=pos(r.memo,q),st=Math.max(0,i-20),sn=(st?"…":"")+r.memo.slice(st,st+80);const ml=el("div","rs");ml.append("메모 · ");ml.appendChild(hl(sn,q));b.appendChild(ml)}
+ }
+ if(r.members.length)b.appendChild(makeDots(r.members));
+ c.append(th,b);
+ c.onclick=()=>openDetail(r.id);
+ c.onkeydown=e=>{if(e.key==="Enter")openDetail(r.id)};
+ return c;
+}
+function runSearch(){
+ renderSFilters();
+ const q=$("sInput").value.trim(),R=$("sResult");R.innerHTML="";
+ if(!q&&!sCats.size&&!sMems.size&&!sYears.size){R.appendChild(el("div","empty-msg","검색어를 입력하거나 필터를 골라 보세요. 초성(예: ㄷㅇㅅㅅ)으로도 찾을 수 있어요."));return}
+ const res=records.filter(r=>(!sCats.size||sCats.has(catOf(r)))&&(!sMems.size||r.members.some(m=>sMems.has(m)))&&(!sYears.size||sYears.has(r.date.slice(0,4)))&&(!q||matchRec(r,q))).sort((a,b)=>b.date.localeCompare(a.date));
+ if(!res.length){R.appendChild(el("div","empty-msg","검색 결과가 없습니다."));return}
+ if(q){
+  const map=new Map();
+  res.forEach(r=>r.songs.forEach(s=>{if(hit(s,q)){if(!map.has(s))map.set(s,[]);map.get(s).push(r)}}));
+  if(map.size){
+   const box=el("div","s-songs");
+   [...map.entries()].slice(0,6).forEach(([s,rs])=>{
+    const row=el("div","sg"),bt=el("b");bt.appendChild(hl(s,q));row.appendChild(bt);
+    row.appendChild(el("span",null,rs.length+"회 기록"));
+    const ds=el("div","sg-d");
+    rs.forEach(r=>{const d=el("button","chip",r.date.replace(/-/g,"."));d.type="button";d.onclick=()=>openDetail(r.id);ds.appendChild(d)});
+    row.appendChild(ds);box.appendChild(row);
+   });
+   R.appendChild(box);
+  }
+ }
+ R.appendChild(el("div","s-count","결과 "+res.length+"건"));
+ res.forEach(r=>R.appendChild(makeResult(r,q)));
+}
+
+/* form */
+function renderTracks(){
+ const p=$("trackPanel"),name=$("fAlbum").value.trim(),list=ALBUMS[name];
+ p.innerHTML="";
+ if(!list){p.hidden=true;return}
+ p.hidden=false;
+ const head=el("div","tl");
+ const allOn=list.every(s=>songs.includes(s));
+ const all=el("button","secondary",allOn?"전체 해제":"전체 추가");all.type="button";
+ all.onclick=()=>{songs=allOn?songs.filter(s=>!list.includes(s)):[...songs,...list.filter(s=>!songs.includes(s))];renderSongs()};
+ head.append(el("span",null,name+" 수록곡 (눌러서 선택)"),all);p.appendChild(head);
+ const wrap=el("div","tc");
+ list.forEach(s=>{
+  const b=el("button","chip",s);b.type="button";b.setAttribute("aria-pressed",songs.includes(s));
+  b.onclick=()=>{songs=songs.includes(s)?songs.filter(x=>x!==s):[...songs,s];renderSongs()};
+  wrap.appendChild(b);
+ });
+ p.appendChild(wrap);
+}
+function renderSongs(){
+ renderTracks();
+ const w=$("songChips");w.innerHTML="";
+ songs.forEach((s,i)=>{const b=el("button","chip",s+" ×");b.type="button";b.setAttribute("aria-label",s+" 삭제");b.onclick=()=>{songs.splice(i,1);renderSongs()};w.appendChild(b)});
+}
+function setSongs(a){songs=[...a];renderSongs()}
+function addSong(){const v=$("fSong").value.trim();if(v&&!songs.includes(v))songs.push(v);$("fSong").value="";renderSongs()}
+
+function renderImgs(){
+ const w=$("imgList");w.innerHTML="";
+ imgs.forEach((src,i)=>{
+  const d=el("div","ith"),im=new Image();im.src=src;im.alt=(i+1)+"번째 이미지";d.appendChild(im);
+  if(i===0)d.appendChild(el("span","tg","대표"));
+  else{const m=el("button","mk","대표로");m.type="button";m.onclick=()=>{imgs.unshift(imgs.splice(i,1)[0]);renderImgs()};d.appendChild(m)}
+  const x=el("button","x","×");x.type="button";x.setAttribute("aria-label","이미지 삭제");x.onclick=()=>{imgs.splice(i,1);renderImgs()};d.appendChild(x);
+  w.appendChild(d);
+ });
+ $("imgAdd").hidden=imgs.length>=4;
+}
+function shrink(file){
+ return new Promise((res,rej)=>{
+  const fr=new FileReader();
+  fr.onload=()=>{const im=new Image();
+   im.onload=()=>{const s=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement("canvas");
+    c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);
+    c.getContext("2d").drawImage(im,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.8))};
+   im.onerror=rej;im.src=fr.result};
+  fr.onerror=rej;fr.readAsDataURL(file);
+ });
+}
+$("fImg").addEventListener("change",async e=>{
+ for(const f of e.target.files){if(imgs.length>=4)break;try{imgs.push(await shrink(f))}catch(_){}}
+ e.target.value="";renderImgs();
+});
+
+function buildPick(sel=[]){
+ const p=$("memberPick");p.innerHTML="";
+ MEMBERS.forEach(m=>{
+  const l=el("label");
+  l.innerHTML=`<input type="checkbox" name="mem" value="${m.id}"><span>${m.name}</span>`;
+  l.querySelector("input").checked=sel.includes(m.id);
+  p.appendChild(l);
+ });
+}
+const boxes=()=>[...document.querySelectorAll("#memberPick input")];
+
+function openNew(date){
+ $("form").reset();$("fId").value="";
+ $("dlgTitle").textContent="새 기록";$("delBtn").hidden=true;$("allBtn").textContent="전체 선택";
+ $("fDate").value=date||dkey(current.getFullYear(),current.getMonth(),new Date().getDate());
+ buildPick([]);imgs=[];renderImgs();setSongs([]);updateConcertList();snap=formState();$("dlg").showModal();
+}
+function openEdit(id){
+ const r=records.find(x=>x.id===id);if(!r)return;
+ $("form").reset();
+ const cr=document.querySelector('input[name=cat][value="'+(r.cat||"concert")+'"]');if(cr)cr.checked=true;
+ $("fId").value=r.id;$("fDate").value=r.date;
+ $("fConcert").value=r.concert||"";$("fAlbum").value=r.album||"";$("fMemo").value=r.memo||"";
+ $("dlgTitle").textContent="기록 수정";$("delBtn").hidden=false;$("allBtn").textContent="전체 선택";
+ buildPick(r.members);imgs=[...r.images];renderImgs();setSongs(r.songs);updateConcertList();snap=formState();$("dlg").showModal();
+}
+async function del(id){
+ if(!(await askConfirm("이 기록을 삭제할까요?","삭제","취소")))return;
+ const backup=records;records=records.filter(x=>x.id!==id);
+ if(!save()){records=backup}
+ render();
+}
+
+$("form").addEventListener("submit",async ev=>{
+ ev.preventDefault();
+ addSong();
+ const id=$("fId").value;
+ const data={
+  id:id||(crypto.randomUUID?crypto.randomUUID():String(Date.now())),
+  date:$("fDate").value,
+  concert:$("fConcert").value.trim(),
+  cat:curCat(),
+  album:$("fAlbum").value.trim(),
+  songs:[...songs],
+  members:boxes().filter(b=>b.checked).map(b=>b.value),
+  images:[...imgs],
+  memo:$("fMemo").value.trim()
+ };
+ if(!data.concert&&!data.album){$("fConcert").focus();await askConfirm("공연명 또는 앨범명을 입력해 주세요.","확인",null);return}
+ const backup=records;
+ records=id?records.map(r=>r.id===id?data:r):[...records,data];
+ if(!save()){records=backup;await askConfirm("저장 공간이 부족해요. 이미지 수를 줄이거나 오래된 기록의 이미지를 삭제해 주세요.","확인",null);return}
+ if(!storageOK)showStoreNote();
+ $("dlg").close();render();
+});
+$("allBtn").onclick=()=>{const all=boxes().every(b=>b.checked);boxes().forEach(b=>b.checked=!all);$("allBtn").textContent=all?"전체 선택":"전체 해제"};
+$("delBtn").onclick=()=>{const id=$("fId").value;$("dlg").close();del(id)};
+$("cancelBtn").onclick=requestClose;
+$("dlg").addEventListener("click",e=>{if(e.target===$("dlg"))requestClose()});
+$("dlg").addEventListener("cancel",e=>{e.preventDefault();requestClose()});
+function curCat(){const c=document.querySelector('input[name=cat]:checked');return c?c.value:"concert"}
+function formState(){return JSON.stringify([$("fDate").value,$("fConcert").value.trim(),curCat(),$("fAlbum").value.trim(),$("fMemo").value.trim(),songs,$("fSong").value.trim(),boxes().filter(b=>b.checked).map(b=>b.value),imgs.map(s=>s.length)])}
+function askConfirm(msg,ok,no){
+ return new Promise(res=>{
+  const d=$("confirmDlg");
+  $("cfMsg").textContent=msg;$("cfOk").textContent=ok||"확인";
+  $("cfNo").textContent=no||"취소";$("cfNo").hidden=(no===null);
+  d.returnValue="";
+  $("cfOk").onclick=()=>d.close("ok");$("cfNo").onclick=()=>d.close("no");
+  d.onclose=()=>res(d.returnValue==="ok");
+  d.showModal();
+ });
+}
+async function requestClose(){
+ if(formState()===snap||await askConfirm("작성 중인 내용이 사라집니다.\n그래도 닫으시겠어요?","닫기","계속 작성"))$("dlg").close();
+}
+function updateConcertList(){
+ const c=curCat(),seen=new Set(),out=[];
+ [...(PRESETS[c]||[]),...records.filter(r=>r.concert&&(r.cat||"concert")===c).map(r=>r.concert)].forEach(v=>{if(v&&!seen.has(v)){seen.add(v);out.push(`<option value="${v.replace(/"/g,"&quot;")}">`)}});
+ $("concertList").innerHTML=out.join("");
+}
+document.querySelectorAll('input[name=cat]').forEach(r=>r.addEventListener("change",updateConcertList));
+$("fConcert").addEventListener("input",()=>{
+ const v=$("fConcert").value.trim();
+ const hit=Object.keys(PRESETS).find(k=>PRESETS[k].includes(v));
+ if(hit&&hit!==curCat()){document.querySelector('input[name=cat][value="'+hit+'"]').checked=true;updateConcertList()}
+});
+$("detailClose").onclick=()=>$("detail").close();
+$("detail").addEventListener("click",e=>{if(e.target===$("detail"))$("detail").close()});
+$("detail").addEventListener("close",()=>{selectedDate="";render()});
+$("addBtn").onclick=()=>openNew();
+$("expBtn").onclick=()=>{
+ const blob=new Blob([JSON.stringify(records)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+ a.download="day6-archive-"+new Date().toISOString().slice(0,10)+".json";
+ document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+};
+$("impBtn").onclick=()=>$("impFile").click();
+$("impFile").addEventListener("change",e=>{
+ const f=e.target.files[0];if(!f)return;
+ const fr=new FileReader();
+ fr.onload=async()=>{
+  let arr;try{arr=JSON.parse(fr.result)}catch(_){arr=null}
+  if(!Array.isArray(arr)||arr.some(r=>!r||typeof r.date!=="string")){await askConfirm("가져올 수 없는 파일이에요. 내보내기로 저장한 .json 파일을 선택해 주세요.","확인",null);return}
+  if(!(await askConfirm("기록 "+arr.length+"개를 가져옵니다. 같은 기록은 덮어쓰고, 나머지는 그대로 둬요.","가져오기","취소")))return;
+  const ids=new Map(records.map(r=>[r.id,r]));
+  arr.forEach(r=>{r.id=r.id||String(Date.now()+Math.random());r.members=r.members||[];r.songs=r.songs||[];r.images=r.images||[];ids.set(r.id,r)});
+  records=[...ids.values()];save();render();
+ };
+ fr.readAsText(f);e.target.value="";
+});
+$("menuBtn").onclick=e=>{const w=$("menuWrap"),on=w.classList.toggle("open");$("menuBtn").setAttribute("aria-expanded",on)};
+document.addEventListener("click",e=>{if(!$("menuWrap").contains(e.target)){$("menuWrap").classList.remove("open");$("menuBtn").setAttribute("aria-expanded","false")}});
+$("addSongBtn").onclick=addSong;
+$("fAlbum").addEventListener("input",renderTracks);
+$("fSong").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addSong()}});
+$("vGallery").onclick=()=>{view="gallery";render()};
+$("vList").onclick=()=>{view="list";render()};
+$("searchBtn").onclick=()=>{sCats.clear();sMems.clear();sYears.clear();$("sInput").value="";runSearch();$("searchDlg").showModal();$("sInput").focus()};
+$("sInput").addEventListener("input",runSearch);
+$("sClose").onclick=()=>$("searchDlg").close();
+$("searchDlg").addEventListener("click",e=>{if(e.target===$("searchDlg"))$("searchDlg").close()});
+$("prev").onclick=()=>{archSel=null;current.setDate(1);current.setMonth(current.getMonth()-1);render()};
+$("next").onclick=()=>{archSel=null;current.setDate(1);current.setMonth(current.getMonth()+1);render()};
+render();
+</script>
+</body>
+</html>
