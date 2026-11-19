@@ -202,6 +202,15 @@ dialog h2{font:500 34px Inter,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;te
 #catPick{margin-bottom:10px}
 .hint{font-size:11px;color:var(--muted);margin-top:6px}
 .field .song-row{display:flex;gap:8px}
+.cb{position:relative;flex:1;min-width:0}
+.cb input{padding-right:44px!important;font-size:16px}
+.cb-t{position:absolute;right:4px;top:4px;bottom:4px;width:40px;border:0;background:transparent;color:var(--soft);border-radius:999px;font-size:16px;cursor:pointer;padding:0}
+.cb-t:hover{background:color-mix(in srgb,var(--ink) 8%,transparent)}
+.cb-l{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:30;margin:0;padding:6px;list-style:none;max-height:240px;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:var(--paper);border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.14)}
+.cb-l[hidden]{display:none}
+.cb-l li{padding:13px 14px;border-radius:12px;font-size:16px;line-height:1.35;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.cb-l li.on,.cb-l li:hover{background:color-mix(in srgb,var(--ink) 8%,transparent)}
+.cb-l li.empty{color:var(--soft);cursor:default}
 .field .song-row input[type=text]{width:auto;flex:1;min-width:0}
 #songChips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .track{margin-top:10px;padding:14px;border:1px solid var(--line);border-radius:18px}
@@ -354,22 +363,19 @@ dialog h2{font:500 34px Inter,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;te
         <label><input type="radio" name="cat" value="festival"><span>페스티벌</span></label>
         <label><input type="radio" name="cat" value="etc"><span>기타</span></label>
       </div>
-      <input id="fConcert" type="text" list="concertList" maxlength="100" placeholder="분류를 고른 뒤 공연 이름을 선택하거나 직접 입력">
-      <datalist id="concertList"></datalist>
+      <div class="cb" id="cbConcert"><input id="fConcert" type="text" maxlength="100" autocomplete="off" role="combobox" aria-expanded="false" placeholder="공연 이름을 선택하거나 입력"><button type="button" class="cb-t" tabindex="-1" aria-label="목록 열기">▾</button><ul class="cb-l" role="listbox" hidden></ul></div>
     </div>
     <div class="field">
       <label for="fAlbum">앨범명</label>
-      <input id="fAlbum" type="text" list="albumList" maxlength="100" placeholder="앨범 이름을 입력하거나 선택">
-      <datalist id="albumList"></datalist>
+      <div class="cb" id="cbAlbum"><input id="fAlbum" type="text" maxlength="100" autocomplete="off" role="combobox" aria-expanded="false" placeholder="앨범 이름을 입력하거나 선택"><button type="button" class="cb-t" tabindex="-1" aria-label="목록 열기">▾</button><ul class="cb-l" role="listbox" hidden></ul></div>
       <div class="hint">공연명과 앨범명 중 하나만 입력해도 저장됩니다.</div>
     </div>
     <div class="field">
       <label for="fSong">곡명</label>
       <div class="song-row">
-        <input id="fSong" type="text" list="songList" maxlength="100" placeholder="곡 이름을 입력하고 추가">
+        <div class="cb" id="cbSong"><input id="fSong" type="text" maxlength="100" autocomplete="off" role="combobox" aria-expanded="false" placeholder="곡 이름을 입력하고 추가"><button type="button" class="cb-t" tabindex="-1" aria-label="목록 열기">▾</button><ul class="cb-l" role="listbox" hidden></ul></div>
         <button type="button" class="secondary" id="addSongBtn">추가</button>
       </div>
-      <datalist id="songList"></datalist>
       <div class="track" id="trackPanel" hidden></div>
       <div id="songChips"></div>
       <div class="hint">앨범을 선택하면 수록곡이 나타나요. 아래에 담긴 곡을 누르면 삭제됩니다.</div>
@@ -602,10 +608,7 @@ function renderArchive(vis){
 
 function renderSuggest(){
  const uniq=a=>[...new Set(a.filter(Boolean))];
- const opt=v=>`<option value="${v.replace(/"/g,"&quot;")}">`;
- $("concertList").innerHTML="";updateConcertList();
- $("albumList").innerHTML=uniq([...Object.keys(ALBUMS),...records.map(r=>r.album)]).map(opt).join("");
- $("songList").innerHTML=uniq(records.flatMap(r=>r.songs)).map(opt).join("");
+ (window.cbs||[]).forEach(c=>c.close());
 }
 
 function render(){
@@ -867,11 +870,55 @@ function askConfirm(msg,ok,no){
 async function requestClose(){
  if(formState()===snap||await askConfirm("작성 중인 내용이 사라집니다.\n그래도 닫으시겠어요?","닫기","계속 작성"))$("dlg").close();
 }
-function updateConcertList(){
- const c=curCat(),seen=new Set(),out=[];
- [...(PRESETS[c]||[]),...records.filter(r=>r.concert&&(r.cat||"concert")===c).map(r=>r.concert)].forEach(v=>{if(v&&!seen.has(v)){seen.add(v);out.push(`<option value="${v.replace(/"/g,"&quot;")}">`)}});
- $("concertList").innerHTML=out.join("");
+function updateConcertList(){if(window.cbs&&cbs[0])cbs[0].refresh()}
+/* custom combobox (모바일 대응) */
+var cbs=[];
+function makeCombo(id,getOpts,onPick){
+ const box=$(id),inp=box.querySelector("input"),tog=box.querySelector(".cb-t"),ul=box.querySelector(".cb-l");
+ let act=-1,items=[];
+ const api={close,refresh};
+ function render(filter){
+  const q=filter?inp.value.trim():"";
+  const all=[...new Set(getOpts().filter(Boolean))];
+  items=q?all.filter(o=>hit(o,q)):all;
+  ul.innerHTML="";act=-1;
+  if(!items.length){ul.appendChild(el("li","empty",q?"일치하는 항목이 없어요. 직접 입력해도 돼요.":"선택할 항목이 없어요."));return}
+  items.forEach((o,i)=>{
+   const li=el("li",null,o);li.setAttribute("role","option");
+   li.addEventListener("pointerdown",e=>{e.preventDefault()});
+   li.addEventListener("click",()=>pick(o));
+   ul.appendChild(li);
+  });
+ }
+ function open(filter){render(filter);ul.hidden=false;inp.setAttribute("aria-expanded","true")}
+ function close(){ul.hidden=true;inp.setAttribute("aria-expanded","false")}
+ function refresh(){if(!ul.hidden)render(false)}
+ function pick(o){close();onPick(o,inp)}
+ function mark(){[...ul.children].forEach((li,i)=>li.classList.toggle("on",i===act));const a=ul.children[act];if(a)a.scrollIntoView({block:"nearest"})}
+ tog.addEventListener("pointerdown",e=>e.preventDefault());
+ tog.addEventListener("click",()=>{if(ul.hidden){open(false)}else close()});
+ inp.addEventListener("focus",()=>{if(ul.hidden)open(false)});
+ inp.addEventListener("click",()=>{if(ul.hidden)open(false)});
+ inp.addEventListener("input",()=>open(true));
+ inp.addEventListener("keydown",e=>{
+  if(e.key==="ArrowDown"){e.preventDefault();if(ul.hidden)open(false);if(items.length){act=(act+1)%items.length;mark()}}
+  else if(e.key==="ArrowUp"){e.preventDefault();if(items.length){act=(act-1+items.length)%items.length;mark()}}
+  else if(e.key==="Enter"){
+   if(!ul.hidden&&act>=0){e.preventDefault();pick(items[act])}
+   else if(id==="cbSong"){e.preventDefault();close();addSong()}
+  }
+  else if(e.key==="Escape"&&!ul.hidden){e.stopPropagation();e.preventDefault();close()}
+ });
+ document.addEventListener("pointerdown",e=>{if(!box.contains(e.target))close()});
+ inp.addEventListener("blur",()=>setTimeout(()=>{if(!box.contains(document.activeElement))close()},120));
+ cbs.push(api);return api;
 }
+makeCombo("cbConcert",()=>{const c=curCat();return[...(PRESETS[c]||[]),...records.filter(r=>r.concert&&(r.cat||"concert")===c).map(r=>r.concert)]},
+ (o,inp)=>{inp.value=o;inp.dispatchEvent(new Event("input"));cbs[0].close()});
+makeCombo("cbAlbum",()=>[...Object.keys(ALBUMS),...records.map(r=>r.album)],
+ (o,inp)=>{inp.value=o;inp.dispatchEvent(new Event("input"));cbs[1].close();inp.blur()});
+makeCombo("cbSong",()=>{const l=ALBUMS[$("fAlbum").value.trim()]||[];return[...l.filter(x=>!songs.includes(x)),...records.flatMap(r=>r.songs)].filter(x=>!songs.includes(x))},
+ (o,inp)=>{inp.value=o;addSong();cbs[2].close();inp.blur()});
 document.querySelectorAll('input[name=cat]').forEach(r=>r.addEventListener("change",updateConcertList));
 $("fConcert").addEventListener("input",()=>{
  const v=$("fConcert").value.trim();
@@ -906,7 +953,7 @@ $("menuBtn").onclick=e=>{const w=$("menuWrap"),on=w.classList.toggle("open");$("
 document.addEventListener("click",e=>{if(!$("menuWrap").contains(e.target)){$("menuWrap").classList.remove("open");$("menuBtn").setAttribute("aria-expanded","false")}});
 $("addSongBtn").onclick=addSong;
 $("fAlbum").addEventListener("input",renderTracks);
-$("fSong").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addSong()}});
+
 $("vGallery").onclick=()=>{view="gallery";render()};
 $("vList").onclick=()=>{view="list";render()};
 $("searchBtn").onclick=()=>{sCats.clear();sMems.clear();sYears.clear();$("sInput").value="";runSearch();$("searchDlg").showModal();$("sInput").focus()};
